@@ -101,27 +101,6 @@
             audio.play();
         }
 
-        async function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const resultElement = document.getElementById("result");
-
-            // Use html2canvas to capture the table and results
-            const canvas = await html2canvas(resultElement, {
-                scale: 2, // Higher scale for better quality
-                useCORS: true, // Handle cross-origin issues
-            });
-
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("p", "mm", "a4");
-
-            // Calculate dimensions to fit the content into the PDF
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-            pdf.addImage(imgData, "PNG", 0, 10, pdfWidth, pdfHeight);
-            pdf.save("downloaded.pdf");
-        }
-
         displayResults();
     </script>
 </body>
