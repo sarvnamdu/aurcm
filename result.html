@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result Page</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Requirement Marks Result</h1>
+        <button onclick="downloadPDF()">Download PDF</button>
+        <div id="result">
+            <!-- Result will be displayed here -->
+        </div>
+
+        <h2>Motivation of the Day</h2>
+        <!-- Audio element for Motivation of the Day -->
+        <audio id="resultAudio" controls>
+            <source src="https://raw.githubusercontent.com/sarvnamdu/diddyxoops/main/hey_parama_padi_da.mp3" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <script>
+        function displayResults() {
+            const studentName = localStorage.getItem("studentName");
+            const marks = JSON.parse(localStorage.getItem("marks"));
+
+            if (!studentName || !marks) {
+                document.getElementById("result").innerHTML = "<p>No data available.</p>";
+                return;
+            }
+
+            let resultHTML = `<h2>Hello ! ${studentName}</h2>`;
+            resultHTML += `
+                <table style="width: 100%; border: 1px solid black; border-collapse: collapse; text-align: center;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid black; padding: 8px;">Subject</th>
+                            <th style="border: 1px solid black; padding: 8px;">Internal Marks</th>
+                            <th style="border: 1px solid black; padding: 8px;">Required Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            const grades = [
+                { grade: "O", minTotal: 91 },
+                { grade: "A+", minTotal: 81 },
+                { grade: "A", minTotal: 71 },
+                { grade: "B+", minTotal: 61 },
+                { grade: "B", minTotal: 56 },
+                { grade: "C", minTotal: 50 },
+            ];
+
+            for (let subject in marks) {
+                const internal1 = marks[subject].internal1;
+                const internal2 = marks[subject].internal2;
+                const internalMark = (internal1 + internal2) / 5;
+
+                resultHTML += `
+                    <tr>
+                        <td style="border: 1px solid black; padding: 8px;">${subject.toUpperCase()}</td>
+                        <td style="border: 1px solid black; padding: 8px;">${internalMark.toFixed(2)}</td>
+                        <td style="border: 1px solid black; padding: 8px; text-align: left;">
+                            <ul style="margin: 0; padding-left: 10px;">
+                `;
+
+                grades.forEach(({ grade, minTotal }) => {
+                    const marksNeeded = minTotal - internalMark;
+                    const externalMarks = marksNeeded / 0.6;
+
+                    if (marksNeeded <= 0) {
+                        resultHTML += `<li>For Grade ${grade}: Already achieved</li>`;
+                    } else if (externalMarks > 100) {
+                        resultHTML += `<li>For Grade ${grade}: Not possible (full marks required)</li>`;
+                    } else {
+                        resultHTML += `<li>For Grade ${grade}: ${externalMarks.toFixed(2)} marks required</li>`;
+                    }
+                });
+
+                resultHTML += `
+                            </ul>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            resultHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById("result").innerHTML = resultHTML;
+
+            // Play the audio when results are displayed
+            const audio = document.getElementById("resultAudio");
+            audio.play();
+        }
+
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const resultElement = document.getElementById("result");
+
+            // Use html2canvas to capture the table and results
+            const canvas = await html2canvas(resultElement, {
+                scale: 2, // Higher scale for better quality
+                useCORS: true, // Handle cross-origin issues
+            });
+
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+
+            // Calculate dimensions to fit the content into the PDF
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            pdf.addImage(imgData, "PNG", 0, 10, pdfWidth, pdfHeight);
+            pdf.save("downloaded.pdf");
+        }
+
+        displayResults();
+    </script>
+</body>
+</html>

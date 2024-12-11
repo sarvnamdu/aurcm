@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Calculation</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="script.js"></script> <!-- Corrected tag -->
+</head>
+<body>
+    <div class="container">
+        <h1>Requirement Mark Calculation</h1>
+        <hr>
+        <form id="markForm">
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" placeholder="Enter student name" required>
+
+            <h2>Enter the Marks</h2>
+            <div class="subject">
+                <h3>Data Structures</h3>
+                <input type="number" placeholder="Internal 1" id="dsInternal1" required>
+                <input type="number" placeholder="Internal 2" id="dsInternal2" required>
+            </div>
+            <div class="subject">
+                <h3>DPCO</h3>
+                <input type="number" placeholder="Internal 1" id="dpcoInternal1" required>
+                <input type="number" placeholder="Internal 2" id="dpcoInternal2" required>
+            </div>
+            <div class="subject">
+                <h3>Foundation of Data Science</h3>
+                <input type="number" placeholder="Internal 1" id="fodsInternal1" required>
+                <input type="number" placeholder="Internal 2" id="fodsInternal2" required>
+            </div>
+            <div class="subject">
+                <h3>Object Oriented Programming</h3>
+                <input type="number" placeholder="Internal 1" id="oopInternal1" required>
+                <input type="number" placeholder="Internal 2" id="oopInternal2" required>
+            </div>
+            <div class="subject">
+                <h3>Discrete Mathematics</h3>
+                <input type="number" placeholder="Internal 1" id="dmInternal1" required>
+                <input type="number" placeholder="Internal 2" id="dmInternal2" required>
+            </div>
+            <button type="button" onclick="storeData()">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        function storeData() {
+            const studentName = document.getElementById("studentName").value;
+            const subjects = ["ds", "dpco", "fods", "oop", "dm"];  <!-- Corrected subject name -->
+            const marks = {};
+
+            subjects.forEach(subject => {
+                const internal1 = parseFloat(document.getElementById(`${subject}Internal1`).value);
+                const internal2 = parseFloat(document.getElementById(`${subject}Internal2`).value);
+                marks[subject] = { internal1, internal2 };
+            });
+
+            // Store data in localStorage
+            localStorage.setItem("studentName", studentName);
+            localStorage.setItem("marks", JSON.stringify(marks));
+
+            // Redirect to result page
+            window.location.href = "result.html";
+        }
+    </script>
+</body>
+</html>
